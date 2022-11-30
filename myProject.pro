@@ -17,14 +17,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     Partition.cpp \
+    form.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     Partition.h \
+    form.h \
     mainwindow.h
 
 FORMS += \
+    form.ui \
     mainwindow.ui
 
 CONFIG += c++17

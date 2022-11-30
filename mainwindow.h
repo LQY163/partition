@@ -3,6 +3,11 @@
 
 #include <QMainWindow>
 #include <QTableWidget>
+#include <QPushButton>
+#include <QLabel>
+#include <QFont>
+#include <vector>
+#include "form.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -19,8 +24,17 @@ public:
 private:
     void init();
     void tableInit_1();
-    void tableInit_2(QTableWidget* table);
-    void tableInit_3();
+    void tableInit_2();
+    void formInit(int choose);
+//    void tableInit_3();
+//    void tableInit_4();
+    void getTableData();
+    std::vector<std::vector<int>> table_data;
+    std::vector<int> job_data;
+    QStringList job_seq;
+//    Form* form;
+    QTableWidget* table_job;
+    QTableWidget* table_initial;
     Ui::MainWindow *ui;
 };
 #endif // MAINWINDOW_H

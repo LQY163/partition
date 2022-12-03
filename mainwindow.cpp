@@ -11,17 +11,19 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     resize(1100,700);
     setWindowTitle("可变分区");
-
-
+    init();
 //    Linklist link =  Linklist ();
 
+//    ui->pushButton_2->setText(std::to_string(link.free_head->data.id).data());
+}
 
+void MainWindow::init()
+{
     table_job = new QTableWidget(4,1,this);
     table_initial = new QTableWidget(5,3,this);
 
     tableInit_1();//table_job
     tableInit_2();//table_initial
-//    tableInit_3();
 
 //    int First_Fit();
 //    int Best_Fit();
@@ -70,35 +72,35 @@ MainWindow::MainWindow(QWidget *parent)
         table_initial->setRowCount(table_initial->rowCount()-1);
     });
 
-    QPushButton* first_fit_btn = new QPushButton("First_Fit",this);
+    QPushButton* first_fit_btn = new QPushButton("首次适应",this);
     first_fit_btn->move(300,500);
     connect(first_fit_btn,&QPushButton::clicked,this,[=]{
         formInit(1);
 
     });
 
-    QPushButton* best_fit_btn = new QPushButton("Best_Fit",this);
+    QPushButton* best_fit_btn = new QPushButton("最优适应",this);
     best_fit_btn->move(400,500);
     connect(best_fit_btn,&QPushButton::clicked,this,[=]{
         formInit(2);
 
     });
 
-    QPushButton* worst_fit_btn = new QPushButton("Worst_Fit",this);
+    QPushButton* worst_fit_btn = new QPushButton("最坏适应",this);
     worst_fit_btn->move(500,500);
     connect(worst_fit_btn,&QPushButton::clicked,this,[=]{
         formInit(3);
 
     });
 
-    QPushButton* nest_fit_btn = new QPushButton("Nest_Fit",this);
+    QPushButton* nest_fit_btn = new QPushButton("下次适应",this);
     nest_fit_btn->move(600,500);
     connect(nest_fit_btn,&QPushButton::clicked,this,[=]{
         formInit(4);
         //
     });
 
-    QPushButton* quick_fit_btn = new QPushButton("Quick_Fit",this);
+    QPushButton* quick_fit_btn = new QPushButton("快速适应",this);
     quick_fit_btn->move(700,500);
     connect(quick_fit_btn,&QPushButton::clicked,this,[=]{
         formInit(5);
@@ -111,26 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
         MainWindow::close();
         //
     });
-
-
-//    ui->pushButton_2->setText(std::to_string(link.free_head->data.id).data());
-
-
-
 }
-
-//void MainWindow::init()
-//{
-//    QWidget* widget = new QWidget();
-//    widget->setWindowTitle("QTableWidget");//
-//    widget->resize(1600,900);
-//    QTableWidget* table = new QTableWidget(10,5,widget);
-//    table->setWindowTitle("QtableWidget");
-//    table->resize(300,350);
-//    table->move(200,100);
-//    widget->show();
-
-//}
 
 void MainWindow::tableInit_1()
 {

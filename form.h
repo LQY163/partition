@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QFont>
 #include <QDebug>
+#include <QMessageBox>
 #include <vector>
 #include "Partition.h"
 
@@ -32,13 +33,16 @@ public:
 private:
     void tableInit_3(QStringList& job_seq,std::vector<int>& job_data);
     void tableInit_4(std::vector<std::vector<int>>& table_data);
-    void malloc(int job);
-    void release(int job);
+    void list_init(std::vector<std::vector<int>>& table_data);
+    bool malloc(int job,int job_size);
+    void release(int job,int job_size);
     void update();
+    void messageBox(int job);
     QTableWidget* job_table;
     QTableWidget* Partition_table;
     std::vector<bool> btn_flag;
     std::vector<QPushButton*> btn_array;
+    Linklist* list;
     Ui::Form *ui;
 };
 

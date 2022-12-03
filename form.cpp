@@ -18,6 +18,7 @@ void Form::init(QStringList& job_seq,std::vector<int>& job_data,std::vector<std:
 {
     tableInit_3(job_seq,job_data);
     tableInit_4(table_data);
+    list_init(table_data);
 }
 
 void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
@@ -36,11 +37,6 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
 
     job_table->setHorizontalHeaderLabels(QStringList()<<"大小(B)"<<"状态");
     job_table->setVerticalHeaderLabels(job_seq);
-//    job_table->setItem(1,1,new QTableWidgetItem (std::to_string(link.free_head->data.size).data()));
-//    job_table->setItem(0,0,new QTableWidgetItem("50"));
-//    job_table->setItem(1,0,new QTableWidgetItem("80"));
-//    job_table->setItem(2,0,new QTableWidgetItem("240"));
-//    job_table->setItem(3,0,new QTableWidgetItem("300"));
 
     btn_array.push_back(new QPushButton("全部分配",this));//btn_array[0]:全部分配
     //btn_flag[0]:全部分配
@@ -62,14 +58,16 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
         connect(btn_array[i+1],&QPushButton::clicked,this,[=](){
             btn_flag[i+1] = !btn_flag[i+1];
             if(!btn_flag[i+1]){
-                btn_array[i+1]->setText("回收");
                 //分配J1
-                malloc(i+1);
+                if(malloc(i+1,job_data[i])) btn_array[i+1]->setText("回收");
+                else btn_flag[i+1] = !btn_flag[i+1];
+                qDebug()<<QString("分配J%1").arg(i+1);
             }
             else{
                 btn_array[i+1]->setText("分配");
                 //回收J1
-                release(i+1);
+                release(i+1,job_data[i]);
+                qDebug()<<QString("回收J%1").arg(i+1);
             }
         });
     }
@@ -104,11 +102,6 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
 void Form::tableInit_4(std::vector<std::vector<int>>& table_data)
 {
 
-//    tableInit_3();
-
-//    table_initial->repaint();
-//    getTableData(table_initial);
-
     Partition_table = new QTableWidget(table_data.size(),3,this);
 
     Partition_table->resize(501,600);//475,300
@@ -142,20 +135,28 @@ void Form::tableInit_4(std::vector<std::vector<int>>& table_data)
 }
 
 
-void Form::malloc(int job)
+void Form::list_init(std::vector<std::vector<int>> &table_data)
 {
+    list = new Linklist();
+    list->init(table_data);
+}
+
+
+bool Form::malloc(int job,int job_size)
+{
+    bool is_ok = false;
     switch(choose){
     case 1://First_Fit
-
+        is_ok = list->First_Fit(job,job_size);
         break;
     case 2://Best_Fit
-
+        is_ok = list->Best_Fit(job,job_size);
         break;
     case 3://Worst_Fit
-
+        is_ok = list->Worst_Fit(job,job_size);
         break;
     case 4://Nest_Fit
-
+        is_ok = list->Nest_Fit(job,job_size);
         break;
     case 5://Quick_Fit
 
@@ -164,38 +165,68 @@ void Form::malloc(int job)
         break;
     }
 
+    if(is_ok){
+        update();
+        return true;
+    }
+    else{
+        messageBox(job);
+        return false;
+    }
 }
 
-void Form::release(int job)
+void Form::release(int job,int job_size)
 {
-    switch(choose){
-    case 1://First_Fit
+    if(choose!=5){
+        if(list->free_one(job)) update();
+//        else ;
+    }
+    else{
 
-        break;
-    case 2://Best_Fit
-
-        break;
-    case 3://Worst_Fit
-
-        break;
-    case 4://Nest_Fit
-
-        break;
-    case 5://Quick_Fit
-
-        break;
-    default:
-        break;
     }
 }
 
 void Form::update()
 {
-
+    QStringList job_seq;
+    int i = 0;
+    Node* p = list->head;
+    while(p){
+        if(i >= Partition_table->rowCount()) Partition_table->insertRow(Partition_table->rowCount());
+        QTableWidgetItem* item0 = new QTableWidgetItem(QString::number(p->data.size));
+        QTableWidgetItem* item1 = new QTableWidgetItem(QString::number(p->data.address));
+        QTableWidgetItem* item2 = new QTableWidgetItem(p->data.state ? "busy" : "free");
+        Partition_table->setItem(i,0,item0);
+        Partition_table->setItem(i,1,item1);
+        Partition_table->setItem(i,2,item2);
+        for(int j=0;j<Partition_table->columnCount();j++){
+            Partition_table->item(i,j)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        }
+        if(p->data.state){
+            item0->setTextColor(QColor(Qt::red));
+            item1->setTextColor(QColor(Qt::red));
+            item2->setTextColor(QColor(Qt::red));
+            job_seq<<QString::fromStdString(list->map[p]);
+        }
+        else job_seq<<QString("%1").arg(i+1);
+        i++;
+        p = p->next;
+    }
+    if(i < Partition_table->rowCount()) Partition_table->setRowCount(i);
+    Partition_table->setVerticalHeaderLabels(job_seq);
 }
+
+
+void Form::messageBox(int job)
+{
+    QMessageBox::critical(this,tr("错误！"),tr("内存不足！\nJ%1分配失败！").arg(job),
+            QMessageBox::Ok | QMessageBox::Cancel , QMessageBox::Ok);
+}
+
 
 Form::~Form()
 {
 //    qDebug()<<"delete ui"<<endl;
+    delete list;
     delete ui;
 }

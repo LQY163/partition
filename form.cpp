@@ -19,6 +19,9 @@ void Form::init(QStringList& job_seq,std::vector<int>& job_data,std::vector<std:
     tableInit_3(job_seq,job_data);
     tableInit_4(table_data);
     list_init(table_data);
+    if(choose == 5){
+        list->quick_array_init();
+    }
 }
 
 void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)

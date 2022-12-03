@@ -9,7 +9,7 @@
 #include<string>
 #include<QObject>
 #include<QtDebug>
-#include<memory>
+#include<map>
 
 using namespace std;
 
@@ -38,6 +38,19 @@ struct Node
     ~Node();
 };
 
+struct Tree
+{
+    Info data;
+    Tree* father;
+    Tree* left;
+    Tree* right;
+    Tree* pre;
+    Tree* next;
+    Tree() = default;
+    explicit Tree(Info&& data,Tree* father=nullptr,Tree* left=nullptr,Tree* right=nullptr,Tree* pre=nullptr,Tree* next=nullptr);
+    ~Tree();
+};
+
 
 template<class T> class MyIterator;
 
@@ -54,6 +67,7 @@ class Linklist
         bool free_one(int);
         void del_one(Node* node);
 		void del();
+        void del_tree(Tree* root);
 		
         bool First_Fit(int seq,int job_size);
         bool Best_Fit(int seq,int job_size);
@@ -63,6 +77,10 @@ class Linklist
 
         bool alloc(int seq,int job_size);
         void update_array();
+
+        void tree_init();
+        void quick_array_init();
+        void Quick_Fit_free(int seq,int job_size);
 		
 		iterator free_begin();
 		iterator free_end();
@@ -70,6 +88,7 @@ class Linklist
 		iterator busy_end();
 		
 	public:
+        Tree* root = nullptr;
         Node* head = nullptr;
 		Node* free_head = nullptr;
 		Node* free_tail = nullptr;
@@ -81,7 +100,9 @@ class Linklist
         vector<Node*> free_array;
         vector<Node*> busy_array;
         vector<int> job_index;
-        map<Node*,string> map;
+        std::map<Node*,string> map;
+        vector<Tree*> quick_array;
+        vector<Tree*> busy_tree;
 };
 
 

@@ -30,6 +30,22 @@ Node::~Node()
     qDebug()<<"Node->info.id:"<<this->data.id<<" delete"<<endl;
 }
 
+
+Tree::Tree(Info&& data,Tree* father,Tree* left,Tree* right,Tree* pre,Tree* next)
+{
+    this->data = data;
+    this->father = father;
+    this->left = left;
+    this->right = right;
+    this->pre = pre;
+    this->next = next;
+}
+
+Tree::~Tree()
+{
+    qDebug()<<"Tree->data.id:"<<this->data.id<<" delete"<<endl;
+}
+
 Linklist::Linklist()
 {
 //	Linklist::init();
@@ -199,8 +215,21 @@ void Linklist::del()
         delete p;
         p = temp;
     }
+
+    quick_array.clear();
+    del_tree(root);
+    for(auto& i : quick_array){
+        delete i;
+    }
 }
 
+void Linklist::del_tree(Tree* root)
+{
+    if(root == nullptr) return ;
+    quick_array.emplace_back(root);
+    if(root->left) del_tree(root->left);
+    if(root->right) del_tree(root->right);
+}
 
 bool Linklist::First_Fit(int seq,int job_size)
 {
@@ -252,6 +281,8 @@ bool Linklist::Nest_Fit(int seq, int job_size)
     //            job_index.push_back(seq);//记录是哪个作业
                 map[free_array[i]] = "J" + std::to_string(seq);
                 last_flag = i;
+
+                update_array();
                 return true;
             }
             else if(free_array[i]->data.size > job_size){//找到第一个比作业大的
@@ -281,6 +312,7 @@ bool Linklist::Nest_Fit(int seq, int job_size)
 
                 last_flag = i;
 
+                update_array();
                 return true;
             }
 
@@ -290,16 +322,61 @@ bool Linklist::Nest_Fit(int seq, int job_size)
 
         }
 
-//        while()
-
-//        for(int i=0;i<size;i++,it++){//遍历数组
-
-//        }
-
-        update_array();
-
         return false;
     }
+}
+
+
+bool Linklist::Quick_Fit(int seq, int job_size)
+{
+
+    int i = 0;
+    while(pow(2,i)<job_size) i++;
+
+    if(quick_array[i] == nullptr){
+        int j = i+1;
+        while(j<=10){
+            if(quick_array[j] != nullptr){
+//                quick_array[j--]--;
+                for( ;j>i; ){
+                    Tree* tree = quick_array[j];
+                    Tree* tree_left = new Tree(Info(1,tree->data.size/2,tree->data.address,BUSY),tree);
+                    Tree* tree_right = new Tree(Info(1,tree->data.size/2,tree->data.address+tree->data.size/2,FREE),tree,nullptr,nullptr,tree_left,nullptr);
+                    tree_right->pre = tree->left;
+                    if(j-1 == i){
+                        quick_array[i]->data.id = seq;
+                        busy_tree.emplace_back(quick_array[i]);
+                    }
+                    quick_array[--j] = tree_right;
+                }
+                return true;
+            }
+            j++;
+            if(j==11) return false;
+        }
+    }
+    else{
+        quick_array[i]->data.id = seq;
+        busy_tree.emplace_back(quick_array[i]);
+        quick_array[i] = quick_array[i]->next;
+        return true;
+    }
+
+    return false;
+}
+
+void Linklist::Quick_Fit_free(int seq, int job_size)
+{
+    Tree* tree = nullptr;
+    int i = 0;
+    for(auto it=busy_tree.begin();it!=busy_tree.end();it++,i++){
+        if((*it)->data.id == seq){
+            tree = *it;
+            busy_tree.erase(it);
+        }
+    }
+    quick_array[i] = quick_array[i]->next;
+
 }
 
 
@@ -307,15 +384,18 @@ bool Linklist::alloc(int seq,int job_size)
 {
     int size = free_array.size();
 
-    auto it = free_array.begin();//空闲数组的起始迭代器，用来删除数组的内容
+//    auto it = free_array.begin();//空闲数组的起始迭代器，用来删除数组的内容
 
-    for(int i=0;i<size;i++,it++){//遍历数组
+    for(int i=0;i<size;i++){//遍历数组
         if(free_array[i]->data.size == job_size){//找到第一个大小相等的
             free_array[i]->data.state = BUSY;
-            free_array.erase(it);//将当前节点从数组中删除
+//            free_array.erase(it);//将当前节点从数组中删除
 //            job_index.push_back(seq);//记录是哪个作业
             map[free_array[i]] = "J" + std::to_string(seq);
+
             last_flag = i;
+
+            update_array();
             return true;
         }
         else if(free_array[i]->data.size > job_size){//找到第一个比作业大的
@@ -345,10 +425,26 @@ bool Linklist::alloc(int seq,int job_size)
 
             last_flag = i;
 
+            update_array();
             return true;
         }
     }
     return false;
+}
+
+
+
+void Linklist::tree_init()
+{
+    root = new Tree(Info(0,1024,0,FREE));
+}
+
+void Linklist::quick_array_init()
+{
+    quick_array[10] = root;
+    for(int i=1;i<10;i++){
+        quick_array[i] = nullptr;
+    }
 }
 
 

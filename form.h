@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTableWidget>
 #include <QPushButton>
+#include <QRadioButton>
 #include <QString>
 #include <QLabel>
 #include <QFont>

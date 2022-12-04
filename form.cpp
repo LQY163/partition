@@ -27,7 +27,7 @@ void Form::init(QStringList& job_seq,std::vector<int>& job_data,std::vector<std:
 void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
 {
     job_table = new QTableWidget(job_data.size(),2,this);
-    job_table->resize(333,219);//333,219
+    job_table->resize(360,219);//333,219
     job_table->move(100,100);
 
     QLabel* label_job = new QLabel("作业分配表",this);
@@ -100,12 +100,15 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
         }
     });
 
+
+
+
 }
 
 void Form::tableInit_4(std::vector<std::vector<int>>& table_data)
 {
-
-    Partition_table = new QTableWidget(table_data.size(),3,this);
+    if(choose==5) Partition_table = new QTableWidget(1,3,this);
+    else Partition_table = new QTableWidget(table_data.size(),3,this);
 
     Partition_table->resize(501,600);//475,300
     Partition_table->move(570,75);
@@ -127,21 +130,33 @@ void Form::tableInit_4(std::vector<std::vector<int>>& table_data)
     label_initial->move(770,25);
 
     Partition_table->setHorizontalHeaderLabels(QStringList()<<"大小(B)"<<"起始地址"<<"状态");
-    for(int i=0;i<Partition_table->rowCount();i++){
-        Partition_table->setItem(i,0,new QTableWidgetItem(QString::number(table_data[i][0])));
-        Partition_table->setItem(i,1,new QTableWidgetItem(QString::number(table_data[i][1])));
-        Partition_table->setItem(i,2,new QTableWidgetItem("free"));
+    if(choose==5){
+        Partition_table->setItem(0,0,new QTableWidgetItem(QString::number(1024)));
+        Partition_table->setItem(0,1,new QTableWidgetItem(QString::number(0)));
+        Partition_table->setItem(0,2,new QTableWidgetItem("free"));
         for(int j=0;j<Partition_table->columnCount();j++){
-            Partition_table->item(i,j)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            Partition_table->item(0,j)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+        }
+
+    }
+    else{
+        for(int i=0;i<Partition_table->rowCount();i++){
+            Partition_table->setItem(i,0,new QTableWidgetItem(QString::number(table_data[i][0])));
+            Partition_table->setItem(i,1,new QTableWidgetItem(QString::number(table_data[i][1])));
+            Partition_table->setItem(i,2,new QTableWidgetItem("free"));
+            for(int j=0;j<Partition_table->columnCount();j++){
+                Partition_table->item(i,j)->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+            }
         }
     }
+
 }
 
 
 void Form::list_init(std::vector<std::vector<int>> &table_data)
 {
     list = new Linklist();
-    list->init(table_data);
+    if(choose != 5)list->init(table_data);
 }
 
 
@@ -162,7 +177,7 @@ bool Form::malloc(int job,int job_size)
         is_ok = list->Nest_Fit(job,job_size);
         break;
     case 5://Quick_Fit
-
+        is_ok = list->Quick_Fit(job,job_size);
         break;
     default:
         break;
@@ -181,12 +196,14 @@ bool Form::malloc(int job,int job_size)
 void Form::release(int job,int job_size)
 {
     if(choose!=5){
-        if(list->free_one(job)) update();
-//        else ;
+        list->free_one(job);
     }
     else{
-
+        int i = 0;
+        while(pow(2,i)<job_size) i++;
+        list->Quick_Fit_free(job,i);
     }
+    update();
 }
 
 void Form::update()
@@ -195,6 +212,9 @@ void Form::update()
     int i = 0;
     Node* p = list->head;
     while(p){
+
+        qDebug()<<"update size:"<<p->data.size<<endl;
+
         if(i >= Partition_table->rowCount()) Partition_table->insertRow(Partition_table->rowCount());
         QTableWidgetItem* item0 = new QTableWidgetItem(QString::number(p->data.size));
         QTableWidgetItem* item1 = new QTableWidgetItem(QString::number(p->data.address));
@@ -209,7 +229,7 @@ void Form::update()
             item0->setTextColor(QColor(Qt::red));
             item1->setTextColor(QColor(Qt::red));
             item2->setTextColor(QColor(Qt::red));
-            job_seq<<QString::fromStdString(list->map[p]);
+            job_seq<<QString("J%1").arg(p->data.id);
         }
         else job_seq<<QString("%1").arg(i+1);
         i++;

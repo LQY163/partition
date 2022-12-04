@@ -65,9 +65,8 @@ class Linklist
         void init(vector<vector<int>>& table_data);
 
         bool free_one(int);
-        void del_one(Node* node);
 		void del();
-        void del_tree(Tree* root);
+        void traverse_tree(Tree* root);
 		
         bool First_Fit(int seq,int job_size);
         bool Best_Fit(int seq,int job_size);
@@ -81,6 +80,9 @@ class Linklist
         void tree_init();
         void quick_array_init();
         void Quick_Fit_free(int seq,int job_size);
+        void merge_tree(Tree* father,int layer);
+
+        void update_list();
 		
 		iterator free_begin();
 		iterator free_end();
@@ -90,54 +92,20 @@ class Linklist
 	public:
         Tree* root = nullptr;
         Node* head = nullptr;
-		Node* free_head = nullptr;
-		Node* free_tail = nullptr;
-		Node* busy_head = nullptr;
-		Node* busy_tail = nullptr;
+
         int last_flag = -1;
-		int free_size;
-		int busy_size;
+
         vector<Node*> free_array;
         vector<Node*> busy_array;
-        vector<int> job_index;
-        std::map<Node*,string> map;
+        vector<int>   job_index;
+        std::map<Node*,int> map;
         vector<Tree*> quick_array;
+        vector<Tree*> tree_array;
         vector<Tree*> busy_tree;
+        vector<Tree*> show_tree;
 };
 
 
-template<class T>
-class MyIterator : public iterator<input_iterator_tag,T>
-{
-	public:
-		MyIterator(T* p){
-			ptr = p;
-		}
-		MyIterator& operator=(const MyIterator& it){
-			ptr = it.ptr;
-		}
-		bool operator!=(const MyIterator& it){
-			return ptr!=it.ptr;
-		}
-		bool operator==(const MyIterator& it){
-			return ptr==it.ptr;
-		}
-		MyIterator& operator++(){
-			ptr++;
-			return *this;
-		}
-		MyIterator operator++(int){
-			MyIterator temp = *this;
-			ptr++;
-			return temp;
-		}
-		T& operator*(){
-			return *ptr;
-		}
-		
-	private:
-		T* ptr;
-};
 
 #endif //PARTITION_H
 

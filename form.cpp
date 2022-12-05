@@ -8,6 +8,7 @@ Form::Form(QWidget *parent) :
     ui->setupUi(this);
 
     resize(1200,900);
+    setWindowTitle("分配");
     setWindowModality(Qt::ApplicationModal);
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -34,7 +35,7 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
     QFont ft;
     ft.setPointSize(15);
     label_job->setFont(ft);
-    label_job->move(185,50);
+    label_job->move(207,50);
 
     job_table->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
@@ -79,7 +80,7 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
 //    btn_array.push_back(new QPushButton("分配",this));    //btn_array[3]:J3分配
 //    btn_array.push_back(new QPushButton("分配",this));    //btn_array[4]:J4分配
 
-    btn_array[0]->move(210,330);//147,330
+    btn_array[0]->move(225,330);//147,330
 
 
     connect(btn_array[0],&QPushButton::clicked,this,[=]{
@@ -101,7 +102,64 @@ void Form::tableInit_3(QStringList& job_seq,std::vector<int>& job_data)
     });
 
 
+    btn_group = new QButtonGroup(this);
+    QRadioButton* radio_btn_1 = new QRadioButton(this);
+    QRadioButton* radio_btn_2 = new QRadioButton(this);
+    QRadioButton* radio_btn_3 = new QRadioButton(this);
+    QRadioButton* radio_btn_4 = new QRadioButton(this);
+    QRadioButton* radio_btn_5 = new QRadioButton(this);
 
+    radio_btn_1->setText("首次适应");
+    radio_btn_1->move(175,400);
+
+    radio_btn_2->setText("最优适应");
+    radio_btn_2->move(175,450);
+
+    radio_btn_3->setText("最坏适应");
+    radio_btn_3->move(300,450);
+
+    radio_btn_4->setText("下次适应");
+    radio_btn_4->move(300,400);
+
+    radio_btn_5->setText("快速适应");
+    radio_btn_5->move(225,500);
+
+    if(choose == 5){
+        radio_btn_1->setEnabled(false);
+        radio_btn_2->setEnabled(false);
+        radio_btn_3->setEnabled(false);
+        radio_btn_4->setEnabled(false);
+    }
+    else radio_btn_5->setEnabled(false);
+
+    switch (choose) {
+        case 1:
+            radio_btn_1->setChecked(true);
+            break;
+        case 2:
+            radio_btn_2->setChecked(true);
+            break;
+        case 3:
+            radio_btn_3->setChecked(true);
+            break;
+        case 4:
+            radio_btn_4->setChecked(true);
+            break;
+        case 5:
+            radio_btn_5->setChecked(true);
+            break;
+    }
+
+    btn_group->addButton(radio_btn_1,1);
+    btn_group->addButton(radio_btn_2,2);
+    btn_group->addButton(radio_btn_3,3);
+    btn_group->addButton(radio_btn_4,4);
+    btn_group->addButton(radio_btn_5,5);
+
+    connect(btn_group,static_cast<void(QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),[=](int id){
+        choose = id;
+        qDebug()<<"choose="<<choose<<endl;
+    });
 
 }
 
@@ -249,7 +307,6 @@ void Form::messageBox(int job)
 
 Form::~Form()
 {
-//    qDebug()<<"delete ui"<<endl;
     delete list;
     delete ui;
 }

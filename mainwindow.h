@@ -26,13 +26,12 @@ private:
     void tableInit_1();
     void tableInit_2();
     void formInit(int choose);
-//    void tableInit_3();
-//    void tableInit_4();
+
     void getTableData();
     std::vector<std::vector<int>> table_data;
     std::vector<int> job_data;
     QStringList job_seq;
-//    Form* form;
+
     QTableWidget* table_job;
     QTableWidget* table_initial;
     Ui::MainWindow *ui;

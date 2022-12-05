@@ -1,6 +1,5 @@
 #include "Partition.h"
 
-//using iterator = MyIterator<Node>;
 
 Info::Info(int id,int size,int address,int state)
 {
@@ -48,7 +47,7 @@ Tree::~Tree()
 
 Linklist::Linklist()
 {
-//	Linklist::init();
+
 }
 
 Linklist::~Linklist()
@@ -72,7 +71,11 @@ void Linklist::init(vector<vector<int>>& table_data)
 }
 
 
-
+/*
+ * 首次适应
+ * seq:作业序号
+ * job_size:作业大小
+ * */
 bool Linklist::First_Fit(int seq,int job_size)
 {
     //根据链表节点的起始地址来排序空闲数组，起始地址从小到大
@@ -83,8 +86,14 @@ bool Linklist::First_Fit(int seq,int job_size)
     return alloc(seq,job_size);
 }
 
+/*
+ * 最优适应
+ * seq:作业序号
+ * job_size:作业大小
+ * */
 bool Linklist::Best_Fit(int seq, int job_size)
 {
+    //根据链表节点的内存大小来排序空闲数组，内存大小从小到大
     sort(free_array.begin(),free_array.end(),[&](Node* a,Node* b){
         return a->data.size < b->data.size;
     });
@@ -92,8 +101,14 @@ bool Linklist::Best_Fit(int seq, int job_size)
     return alloc(seq,job_size);
 }
 
+/*
+ * 最坏适应
+ * seq:作业序号
+ * job_size:作业大小
+ * */
 bool Linklist::Worst_Fit(int seq, int job_size)
 {
+    //根据链表节点的内存大小来排序空闲数组，内存大小从大到小
     sort(free_array.begin(),free_array.end(),[&](Node* a,Node* b){
         return a->data.size > b->data.size;
     });
@@ -101,6 +116,11 @@ bool Linklist::Worst_Fit(int seq, int job_size)
     return alloc(seq,job_size);
 }
 
+/*
+ * 下次适应
+ * seq:作业序号
+ * job_size:作业大小
+ * */
 bool Linklist::Nest_Fit(int seq, int job_size)
 {
     if(last_flag==-1){
@@ -112,16 +132,14 @@ bool Linklist::Nest_Fit(int seq, int job_size)
     else{
         int size = free_array.size();
 
-//        auto it = free_array.begin();//空闲数组的起始迭代器，用来删除数组的内容
-
         int i=last_flag;
 
         while(1){
             if(free_array[i]->data.size == job_size){//找到第一个大小相等的
                 free_array[i]->data.state = BUSY;
                 free_array[i]->data.id = seq;
-//                free_array.erase(it);//将当前节点从数组中删除
-    //            job_index.push_back(seq);//记录是哪个作业
+
+                //记录是哪个作业
                 map[free_array[i]] = seq;
                 last_flag = i;
 
@@ -138,7 +156,7 @@ bool Linklist::Nest_Fit(int seq, int job_size)
                 free_array[i]->data.state = BUSY;
                 free_array[i]->data.id = seq;
 
-    //            job_index.push_back(seq);//记录是哪个作业
+                //记录是哪个作业
                 map[free_array[i]] = seq;
 
                 int address = free_array[i]->data.address + job_size;
@@ -171,6 +189,11 @@ bool Linklist::Nest_Fit(int seq, int job_size)
 }
 
 
+/*
+ * 快速适应
+ * seq:作业序号
+ * job_size:作业大小
+ * */
 bool Linklist::Quick_Fit(int seq, int job_size)
 {
 
@@ -185,7 +208,6 @@ bool Linklist::Quick_Fit(int seq, int job_size)
                 Tree* tree = quick_array[j];
                 quick_array[j] = tree->next;
                 for( ;j>i; ){
-//                    tree = quick_array[j];
                     Tree* tree_left = new Tree(Info(1,tree->data.size/2,tree->data.address,BUSY),tree);
                     Tree* tree_right = new Tree(Info(1,tree->data.size/2,tree->data.address+tree->data.size/2,FREE),tree);
                     tree->left = tree_left;
@@ -220,24 +242,26 @@ bool Linklist::Quick_Fit(int seq, int job_size)
 }
 
 
-
+/*
+ * 分配
+ * seq:作业序号
+ * job_size:作业大小
+ * */
 bool Linklist::alloc(int seq,int job_size)
 {
     int size = free_array.size();
-
-//    auto it = free_array.begin();//空闲数组的起始迭代器，用来删除数组的内容
 
     for(int i=0;i<size;i++){//遍历数组
         if(free_array[i]->data.size == job_size){//找到第一个大小相等的
             free_array[i]->data.state = BUSY;
             free_array[i]->data.id = seq;
-//            free_array.erase(it);//将当前节点从数组中删除
-//            job_index.push_back(seq);//记录是哪个作业
+
+            //记录是哪个作业
             map[free_array[i]] = seq;
 
-            last_flag = i;
+            last_flag = i;//下次适应算法中用到，用来标记下次从哪里开始扫描，其值为空闲数组的下标
 
-            update_array();
+            update_array();//更新空闲数组
             return true;
         }
         else if(free_array[i]->data.size > job_size){//找到第一个比作业大的
@@ -250,7 +274,7 @@ bool Linklist::alloc(int seq,int job_size)
             free_array[i]->data.state = BUSY;
             free_array[i]->data.id = seq;
 
-//            job_index.push_back(seq);//记录是哪个作业
+            //记录是哪个作业
             map[free_array[i]] = seq;
 
             int address = free_array[i]->data.address + job_size;
@@ -266,18 +290,22 @@ bool Linklist::alloc(int seq,int job_size)
 
             free_array[i] = node;//把原来节点换成新的空闲节点
 
-            last_flag = i;
+            last_flag = i;//下次适应算法中用到，用来标记下次从哪里开始扫描，其值为空闲数组的下标
 
-            update_array();
+            update_array();//更新空闲数组
             return true;
         }
     }
     return false;
 }
 
+
+/*
+ * 回收
+ * seq:作业序号
+ * */
 bool Linklist::free_one(int seq)
 {
-//    string job_seq = "J" + std::to_string(seq);
     Node* node = nullptr;
     for(const auto& item : map){
         if(item.second == seq){
@@ -393,7 +421,11 @@ bool Linklist::free_one(int seq)
 }
 
 
-
+/*
+ * 快速适应算法的回收
+ * seq:作业序号
+ * layer:层数
+ * */
 void Linklist::Quick_Fit_free(int seq, int layer)
 {
     Tree* tree = nullptr;
@@ -406,11 +438,16 @@ void Linklist::Quick_Fit_free(int seq, int layer)
     }
     tree->data.state = FREE;
 
-    merge_tree(tree->father,layer);
+    merge_tree(tree->father,layer);//递归合并树
 
-    update_list();
+    update_list();//更新链表
 }
 
+
+/*
+ * 前序遍历树
+ * root:树根
+ * */
 void Linklist::traverse_tree(Tree* root)
 {
     if(root == nullptr) return ;
@@ -421,6 +458,11 @@ void Linklist::traverse_tree(Tree* root)
 }
 
 
+/*
+ * 合并树
+ * father:子节点的父亲
+ * layer:层数
+ * */
 void Linklist::merge_tree(Tree *father,int layer)
 {
     if(father == nullptr) return ;
@@ -475,7 +517,9 @@ void Linklist::merge_tree(Tree *father,int layer)
 }
 
 
-
+/*
+ * 销毁链表和树
+ * */
 void Linklist::del()
 {
     Node* p = head;
@@ -498,21 +542,9 @@ void Linklist::del()
 }
 
 
-
-void Linklist::tree_init()
-{
-    root = new Tree(Info(0,1024,0,FREE));
-}
-
-void Linklist::quick_array_init()
-{
-    tree_init();
-    for(int i=0;i<10;i++){
-        quick_array.push_back(nullptr);
-    }
-    quick_array.push_back(root);
-}
-
+/*
+ * 更新链表
+ * */
 void Linklist::update_list()
 {
     tree_array.clear();
@@ -546,6 +578,10 @@ void Linklist::update_list()
 
 }
 
+
+/*
+ * 更新空闲数组
+ * */
 void Linklist::update_array()
 {
     free_array.clear();
@@ -559,6 +595,23 @@ void Linklist::update_array()
         p = p->next;
     }
 }
+
+
+void Linklist::tree_init()
+{
+    root = new Tree(Info(0,1024,0,FREE));
+}
+
+void Linklist::quick_array_init()
+{
+    tree_init();
+    for(int i=0;i<10;i++){
+        quick_array.push_back(nullptr);
+    }
+    quick_array.push_back(root);
+}
+
+
 
 
 

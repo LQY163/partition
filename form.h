@@ -5,6 +5,7 @@
 #include <QTableWidget>
 #include <QPushButton>
 #include <QRadioButton>
+#include <QButtonGroup>
 #include <QString>
 #include <QLabel>
 #include <QFont>
@@ -39,8 +40,12 @@ private:
     void release(int job,int job_size);
     void update();
     void messageBox(int job);
+
     QTableWidget* job_table;
     QTableWidget* Partition_table;
+    QButtonGroup* btn_group;
+
+
     std::vector<bool> btn_flag;
     std::vector<QPushButton*> btn_array;
     Linklist* list;

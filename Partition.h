@@ -52,13 +52,10 @@ struct Tree
 };
 
 
-template<class T> class MyIterator;
-
 class Linklist
 {
 
 	public:
-		using iterator = MyIterator<Node>;
         Linklist();
 		~Linklist();
 		
@@ -83,11 +80,6 @@ class Linklist
         void merge_tree(Tree* father,int layer);
 
         void update_list();
-		
-		iterator free_begin();
-		iterator free_end();
-		iterator busy_begin();
-		iterator busy_end();
 		
 	public:
         Tree* root = nullptr;

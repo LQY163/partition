@@ -12,9 +12,6 @@ MainWindow::MainWindow(QWidget *parent)
     resize(1100,700);
     setWindowTitle("可变分区");
     init();
-//    Linklist link =  Linklist ();
-
-//    ui->pushButton_2->setText(std::to_string(link.free_head->data.id).data());
 }
 
 void MainWindow::init()
@@ -25,11 +22,6 @@ void MainWindow::init()
     tableInit_1();//table_job
     tableInit_2();//table_initial
 
-//    int First_Fit();
-//    int Best_Fit();
-//    int Worst_Fit();
-//    int Nest_Fit();
-//    int Quick_Fit();
     QPushButton* add_job_btn = new QPushButton("添加",this);
     add_job_btn->move(103,375);
     connect(add_job_btn,&QPushButton::clicked,this,[=]{
@@ -124,12 +116,12 @@ void MainWindow::tableInit_1()
     QFont ft;
     ft.setPointSize(15);
     label_job->setFont(ft);
-    label_job->move(145,50);
+    label_job->move(160,50);
 
     job_seq<<"J1"<<"J2"<<"J3"<<"J4";
     table_job->setHorizontalHeaderLabels(QStringList()<<"大小(B)"<<"状态");
     table_job->setVerticalHeaderLabels(job_seq);
-//    table_job->setItem(1,1,new QTableWidgetItem (std::to_string(link.free_head->data.size).data()));
+
     table_job->setItem(0,0,new QTableWidgetItem("50"));
     table_job->setItem(1,0,new QTableWidgetItem("80"));
     table_job->setItem(2,0,new QTableWidgetItem("240"));
@@ -152,7 +144,7 @@ void MainWindow::tableInit_2()
     label_initial->move(675,25);
 
     table_initial->setHorizontalHeaderLabels(QStringList()<<"大小(B)"<<"起始地址"<<"状态");
-    QString str_size[5] = {"25","75","150","300","450"};
+    QString str_size[5] = {"25","75","150","300","474"};
     QString str_adders[5] = {"0","25","100","250","550"};
     QString str_state[5] = {"free","free","free","free","free"};
     for(int i=0;i<5;i++){
@@ -199,8 +191,6 @@ void MainWindow::getTableData()
 
 MainWindow::~MainWindow()
 {
-//    delete widget;
-//    delete form;
     delete ui;
 }
 

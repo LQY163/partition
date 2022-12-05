@@ -36,3 +36,11 @@ CONFIG += c++17
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+	logo.qrc
+
+
+RC_ICONS += logo.ico
+
+
